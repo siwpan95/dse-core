@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cordis-py"
+version = "0.1.0"
+description = "字典场景引擎内核（Python 版）—— 迷你 Cordis 插件容器 + 场景字典解释器。场景即字典，能力即插件。"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "siwpan" }]
+keywords = ["cordis", "text-adventure", "interactive-fiction", "game-engine", "narrative", "文字冒险"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Games/Entertainment",
+]
+dependencies = []
+
+[project.optional-dependencies]
+yaml = ["PyYAML>=6"]          # 装了才能读 cordis.yml（不装则用 cordis.json）
+dev = ["pytest>=7"]           # 可选：测试用标准库 unittest 就能跑
+
+[project.urls]
+Homepage = "https://gitee.com/siwpan/dse-core"
+"Node 版" = "https://gitee.com/siwpan/dse-core"
+
+[project.scripts]
+dse = "cli:main"
+
+[tool.setuptools]
+packages = ["cordis", "lib", "plugins", "sdk"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

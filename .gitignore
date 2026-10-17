@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# 运行时产物
+saves/
+deliverables/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+.workbuddy/
+
+# 测试缓存
+.pytest_cache/
+htmlcov/
+.coverage

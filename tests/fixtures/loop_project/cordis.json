@@ -1,0 +1,44 @@
+{
+  "note": "测试用外部内容项目：验证 SDK 的 root 参数（一个引擎驱动多个项目）。插件路径相对本文件所在目录解析，因此用 ../../../ 指回引擎。",
+  "plugins": [
+    {
+      "id": "scenes",
+      "name": "../../../plugins/scenes.py",
+      "config": {
+        "packs": [
+          "./content/loop.py"
+        ]
+      }
+    },
+    {
+      "id": "state",
+      "name": "../../../plugins/state.py",
+      "config": {
+        "loopKeep": [
+          "clues.loop"
+        ],
+        "initial": {
+          "name": "tester",
+          "gold": 0,
+          "clues": {
+            "loop": {}
+          },
+          "loop": {
+            "moves": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "io",
+      "name": "../../../plugins/console_io.py"
+    },
+    {
+      "id": "engine",
+      "name": "../../../plugins/engine.py",
+      "config": {
+        "entry": "loop.dawn"
+      }
+    }
+  ]
+}

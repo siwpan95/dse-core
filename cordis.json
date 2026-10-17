@@ -1,0 +1,211 @@
+{
+  "note": "插件清单（声明式组装）。改这里 = 改引擎构成，代码不用动。依赖注入由容器编排：插件声明 inject，依赖就绪后才启动，因此书写顺序不等于启动顺序。",
+  "plugins": [
+    {
+      "id": "scenes",
+      "name": "./plugins/scenes.py",
+      "config": {
+        "packs": [
+          "./content/starter.py"
+        ]
+      }
+    },
+    {
+      "id": "state",
+      "name": "./plugins/state.py",
+      "config": {
+        "loopKeep": [
+          "clues.loop",
+          "flags.loop"
+        ],
+        "initial": {
+          "name": "旅人",
+          "hp": 20,
+          "maxHp": 20,
+          "atk": 3,
+          "def": 2,
+          "crit": 0.15,
+          "gold": 20,
+          "locale": "zh-CN",
+          "items": {},
+          "flags": {
+            "loop": {}
+          },
+          "clues": {
+            "loop": {}
+          },
+          "diaryRead": [],
+          "dialogueAsked": [],
+          "stock": {},
+          "tradeDay": null,
+          "tradeBaseGold": null,
+          "tradeProfit": 0
+        }
+      }
+    },
+    {
+      "id": "io",
+      "name": "./plugins/console_io.py"
+    },
+    {
+      "id": "engine",
+      "name": "./plugins/engine.py",
+      "config": {
+        "entry": "start",
+        "prompt": ">> "
+      }
+    },
+    {
+      "id": "save-migrate",
+      "name": "./plugins/save_migrate.py",
+      "config": {
+        "version": 1,
+        "migrations": {}
+      }
+    },
+    {
+      "id": "save",
+      "name": "./plugins/save.py",
+      "config": {
+        "dir": "./saves"
+      }
+    },
+    {
+      "id": "achievements",
+      "name": "./plugins/achievements.py",
+      "config": {
+        "list": [
+          {
+            "id": "starter-wolf",
+            "name": "第一头狼",
+            "desc": "《启程》：在山道上放倒了独眼狼",
+            "when": "scene === 'forest-win'"
+          },
+          {
+            "id": "starter-river",
+            "name": "过河的人",
+            "desc": "《启程》：上了那班船，过了河",
+            "when": "scene === 'end-hero'"
+          },
+          {
+            "id": "starter-stay",
+            "name": "岸这边",
+            "desc": "《启程》：摇了头，留在岸这边",
+            "when": "scene === 'end-stay'"
+          },
+          {
+            "id": "merchant",
+            "name": "半间铺面",
+            "desc": "《启程》：赚够了钱，租下半间铺面",
+            "when": "scene === 'end-merchant'"
+          }
+        ]
+      }
+    },
+    {
+      "id": "i18n",
+      "name": "./plugins/i18n.py",
+      "config": {
+        "defaultLocale": "zh-CN",
+        "locales": {}
+      }
+    },
+    {
+      "id": "combat",
+      "name": "./plugins/combat.py",
+      "config": {
+        "formula": {
+          "variance": 0.2,
+          "defenseFactor": 0.5,
+          "critMult": 1.8,
+          "defendCut": 0.5,
+          "fleeChance": 0.45
+        },
+        "weapons": {
+          "rusty_sword": {
+            "name": "锈剑",
+            "atk": 4
+          },
+          "silver_dagger": {
+            "name": "银匕首",
+            "atk": 3
+          }
+        },
+        "enemies": {
+          "wolf": {
+            "name": "独眼狼",
+            "hp": 12,
+            "atk": 3,
+            "def": 0,
+            "crit": 0.1,
+            "drops": {
+              "gold": 5,
+              "items.wolf_pelt": 1
+            }
+          },
+          "bandit": {
+            "name": "沙盗",
+            "hp": 14,
+            "atk": 3,
+            "def": 1,
+            "crit": 0.12,
+            "drops": {
+              "gold": 12
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "trade",
+      "name": "./plugins/trade.py",
+      "config": {
+        "goods": {
+          "tea": {
+            "name": "茶",
+            "buy": 8
+          },
+          "salt": {
+            "name": "盐",
+            "buy": 4
+          },
+          "cloth": {
+            "name": "布",
+            "buy": 2
+          }
+        },
+        "schedule": [
+          [12, 10, 15],
+          [5, 8, 5],
+          [3, 3, 6]
+        ]
+      }
+    },
+    {
+      "id": "diary",
+      "name": "./plugins/diary.py"
+    },
+    {
+      "id": "dialogue",
+      "name": "./plugins/dialogue.py"
+    },
+    {
+      "id": "sound",
+      "name": "./plugins/sound.py",
+      "config": {
+        "mute": true
+      }
+    },
+    {
+      "id": "hot-reload",
+      "name": "./plugins/hot_reload.py",
+      "config": {
+        "paths": [
+          "./content"
+        ],
+        "debounce": 200,
+        "enabled": false
+      }
+    }
+  ]
+}
