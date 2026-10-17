@@ -1,0 +1,6 @@
+# 统一换行符为 LF，避免跨平台协作时整文件 diff
+* text=auto eol=lf
+
+# 二进制/产物文件不做换行转换
+*.wav binary
+*.pdf binary

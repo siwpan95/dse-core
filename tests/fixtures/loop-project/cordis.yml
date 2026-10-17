@@ -1,0 +1,35 @@
+# 测试用外部内容项目（验证 SDK 的 root 参数：一个引擎驱动多个项目）
+# 与引擎自带的 cordis.yml 是两回事：这里只挂本项目的循环短篇。
+# 插件路径相对于本文件所在目录解析。
+
+- id: logger
+  name: '@cordisjs/plugin-logger-console'
+  config:
+    colors: false
+
+- id: scenes
+  name: ../../../plugins/scenes.js
+  config:
+    packs:
+      - ./content/loop.js
+
+- id: state
+  name: ../../../plugins/state.js
+  config:
+    loopKeep:
+      - clues.loop        # 时间循环：线索跨轮保留，行动力每轮复原
+    initial:
+      name:  tester
+      gold: 0
+      clues:
+        loop: {}
+      loop:
+        moves: 3           # 每轮行动力
+
+- id: io
+  name: ../../../plugins/console-io.js
+
+- id: engine
+  name: ../../../plugins/engine.js
+  config:
+    entry: loop.dawn

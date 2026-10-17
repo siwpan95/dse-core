@@ -1,0 +1,92 @@
+{
+  "name": "dse-core",
+  "version": "0.1.0",
+  "description": "字典场景引擎内核（Dictionary Scene Engine · Core）—— 基于 Cordis 4.0 插件架构、与内容解耦的文字冒险引擎。场景即字典，能力即插件。",
+  "type": "module",
+  "main": "./sdk/index.js",
+  "exports": {
+    ".": "./sdk/index.js",
+    "./modes": "./lib/modes.mjs",
+    "./registry": "./lib/registry.mjs",
+    "./graph": "./lib/graph.mjs",
+    "./schema/scene.schema.json": "./schema/scene.schema.json"
+  },
+  "bin": {
+    "dse": "./cli.js"
+  },
+  "scripts": {
+    "start": "node game.js",
+    "start:hmr": "node --expose-internals game.js",
+    "build:hmr": "node scripts/build-hmr.mjs",
+    "lint:content": "node scripts/lint-content.mjs",
+    "new": "node cli.js new",
+    "test": "node tests/unit.mjs && node tests/e2e.mjs && node tests/cli.mjs",
+    "test:unit": "node tests/unit.mjs",
+    "test:e2e": "node tests/e2e.mjs",
+    "test:cli": "node tests/cli.mjs",
+    "test:traverse": "node tests/traverse.mjs",
+    "test:coverage": "node tests/coverage.mjs",
+    "test:all": "node tests/unit.mjs && node tests/e2e.mjs && node tests/cli.mjs && node tests/traverse.mjs && node tests/coverage.mjs",
+    "gen:routes": "node scripts/gen-routes.mjs",
+    "play:auto": "node scripts/auto-playthrough.mjs",
+    "ai:convert": "node scripts/ai/convert.mjs",
+    "ai:batch": "node scripts/ai/batch.mjs",
+    "ai:report": "node scripts/ai/report.mjs --write docs/ai-content-stats.md"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "game.js",
+    "cli.js",
+    "lib/",
+    "plugins/",
+    "sdk/",
+    "schema/",
+    "templates/",
+    "types/",
+    "cordis.yml",
+    "content/",
+    "vendor/",
+    "scripts/",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "cordis",
+    "text-adventure",
+    "interactive-fiction",
+    "game-engine",
+    "plugin-architecture",
+    "dialogue-graph",
+    "narrative-engine",
+    "文字冒险",
+    "游戏引擎",
+    "叙事引擎"
+  ],
+  "author": "全哥 (siwpan)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/siwpan/dse-core"
+  },
+  "homepage": "https://gitee.com/siwpan/dse-core",
+  "bugs": {
+    "url": "https://gitee.com/siwpan/dse-core/issues"
+  },
+  "dependencies": {
+    "@babel/code-frame": "^8.0.0",
+    "@cordisjs/plugin-include": "1.0.5",
+    "@cordisjs/plugin-loader": "1.0.0-rc.6",
+    "@cordisjs/plugin-logger-console": "^1.0.0",
+    "@cordisjs/plugin-timer": "^1.1.3",
+    "chokidar": "^4.0.3",
+    "cordis": "4.0.0-rc.9",
+    "js-yaml": "^4.1.0",
+    "picomatch": "^4.0.7",
+    "schemastery": "^3.18.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}

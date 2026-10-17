@@ -1,0 +1,10 @@
+node_modules/
+saves/
+*.log
+# 逐线实跑转录产物（tests/playthrough.mjs 生成，供人工阅读留存，不入库）
+deliverables/
+
+# 第三方源码转储 + 临时工作区（2026-09-22 治理：不入库；第三方只留来源链接）
+run_and_run/
+.workbuddy/
+scripts/routes.generated.json

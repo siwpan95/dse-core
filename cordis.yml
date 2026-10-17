@@ -1,0 +1,152 @@
+# 字典场景引擎内核（dse-core）· 插件清单
+#
+# 与内容仓库的关系：本文件是**引擎默认开发配置**，只挂自带示例内容包
+# （content/starter.js）。真正的项目应在自己的仓库里放一份 cordis.yml，
+# 指向自己的内容包与数值表 —— 引擎代码一行都不用改。
+#
+# 依赖注入由 Cordis 自动编排：插件用 static inject 声明所需服务，
+# 全部就绪后才会启动，无需手工控制顺序。
+#
+# 插件分层：
+#   内核层  scenes / state / io / engine          引擎不可拔的四个基础服务
+#   系统层  save / save-migrate / achievements / i18n
+#   能力层  combat / trade / diary / dialogue     接管 scene.mode 的可选玩法
+#   表现层  sound
+#   开发层  hot-reload（内容热重载）
+
+- id: logger
+  name: '@cordisjs/plugin-logger-console'
+  config:
+    colors: false            # Windows 控制台关闭 ANSI 颜色，避免乱码
+    showTime: 'HH:mm:ss '
+
+- id: timer
+  name: '@cordisjs/plugin-timer'   # HMR 插件的防抖依赖（官方 hmr 需要）
+
+# ── 内核层 ──────────────────────────────────────────────────────
+- id: scenes
+  name: ./plugins/scenes.js
+  config:
+    packs:                    # 内容包列表（后者覆盖前者同 ID 场景）
+      - ./content/starter.js  # 引擎自带示例；换成自己的内容包即可
+
+- id: state
+  name: ./plugins/state.js
+  config:
+    # 时间循环保留域：goto '@loop:<场景>' 时保留这些前缀下的知识，
+    # 其余状态回 initial（"知识跨轮保留、消耗态每轮复原"）
+    loopKeep:
+      - clues.loop
+      - flags.loop
+    # 玩家初始状态。内容包用到的顶层数值字段必须在这里预声明，
+    # 否则条件表达式会 ReferenceError（lint 的「数值字段」检查项会拦下）
+    initial:
+      name: 旅人
+      hp: 20
+      maxHp: 20
+      atk: 3                  # 基础攻击（+ 武器加成 = 实际 ATK）
+      def: 2                  # 防御（每点抵消 defenseFactor 点伤害）
+      crit: 0.15              # 暴击率
+      gold: 20
+      locale: zh-CN           # i18n 插件读写（可用 lang 命令切换）
+      items: {}
+      flags:
+        loop: {}              # 时间循环中间层（预声明，条件链才不抛错）
+      clues:
+        loop: {}              # 时间循环跨轮知识（loopKeep 保留域）
+      diaryRead: []           # diary 插件：已读篇目 ID（存档可恢复）
+      dialogueAsked: []       # dialogue 插件：已问话题 ID（存档可恢复）
+      stock: {}               # trade 插件：库存
+      tradeDay: null          # trade 插件：经营天数
+      tradeBaseGold: null     # trade 插件：开市基线资金
+      tradeProfit: 0          # trade 插件：收市净赚（结局判定用）
+
+- id: io
+  name: ./plugins/console-io.js
+
+- id: engine
+  name: ./plugins/engine.js
+  config:
+    entry: start              # 入场场景 ID（可用 DSE_ENTRY / --entry 覆盖）
+    prompt: '>> '
+
+# ── 系统层 ──────────────────────────────────────────────────────
+- id: save-migrate
+  name: ./plugins/save-migrate.js
+  config:
+    version: 1                # 当前存档格式版本
+    migrations: {}            # 迁移链骨架：{ 2: './migrations/to-v2.js' }
+
+- id: save
+  name: ./plugins/save.js
+  config:
+    dir: ./saves
+
+- id: achievements
+  name: ./plugins/achievements.js
+  config:
+    list:                     # 成就表（数据驱动，when 为条件表达式）
+      - { id: starter-wolf,    name: 第一头狼,   desc: 《启程》：在山道上放倒了独眼狼,   when: 'scene === "forest-win"' }
+      - { id: starter-river,   name: 过河的人,   desc: 《启程》：上了那班船，过了河,     when: 'scene === "end-hero"' }
+      - { id: starter-stay,    name: 岸这边,     desc: 《启程》：摇了头，留在岸这边,     when: 'scene === "end-stay"' }
+      - { id: merchant,        name: 半间铺面,   desc: 《启程》：赚够了钱，租下半间铺面, when: 'scene === "end-merchant"' }
+
+- id: i18n
+  name: ./plugins/i18n.js
+  config:
+    defaultLocale: zh-CN
+    # 本地化骨架：空表 = 直通（内容里写什么就显示什么）。
+    # 需要多语言时把正文改成 `@key@` 引用，再在这里填各语言的表。
+    locales: {}
+
+# ── 能力层（每种能力接管一种 scene.mode）────────────────────────
+- id: combat
+  name: ./plugins/combat.js
+  config:
+    formula:                  # 数值公式参数（可选，覆盖默认值）
+      variance: 0.2           # 伤害随机波动 ±20%
+      defenseFactor: 0.5      # 每点防御抵消的伤害
+      critMult: 1.8           # 暴击倍率
+      defendCut: 0.5          # 防御姿态减伤 50%
+      fleeChance: 0.45        # 逃跑成功率
+    weapons:                  # 武器加成（按背包数量累加到玩家 ATK）
+      rusty_sword:   { name: 锈剑, atk: 4 }
+      silver_dagger: { name: 银匕首, atk: 3 }
+    enemies:                  # 敌人字典（数据驱动，与场景字典同哲学）
+      wolf:   { name: 独眼狼, hp: 12, atk: 3, def: 0, crit: 0.10, drops: { gold: +5, 'items.wolf_pelt': +1 } }
+      bandit: { name: 沙盗,   hp: 14, atk: 3, def: 1, crit: 0.12, drops: { gold: +12 } }
+
+- id: trade
+  name: ./plugins/trade.js
+  config:
+    goods:                    # 商品表（进价，数据驱动）
+      tea:   { name: 茶, buy: 8 }
+      salt:  { name: 盐, buy: 4 }
+      cloth: { name: 布, buy: 2 }
+    schedule:                 # 确定性行情（行=商品，列=第 1..N 天卖出价）
+      - [12, 10, 15]          # 茶：第 3 天看涨
+      - [5, 8, 5]             # 盐：第 2 天看涨
+      - [3, 3, 6]             # 布：第 3 天看涨
+
+- id: diary
+  name: ./plugins/diary.js      # 接管 mode: 'diary'（只读重读已走过的篇目）
+
+- id: dialogue
+  name: ./plugins/dialogue.js   # 接管 mode: 'dialogue'（话题询问 + 注意点预算）
+
+# ── 表现层 ──────────────────────────────────────────────────────
+- id: sound
+  name: ./plugins/sound.js
+  config:
+    mute: false               # 静音开关（也可 DSE_MUTE=1；CI 里建议静音）
+    sampleRate: 22050
+    sounds:                   # 覆盖/扩充音效库（事件 → 音色）
+      battle-crit: { notes: [330, 440, 587], ms: 70, wave: square, gain: 0.2 }
+
+# ── 开发层 ──────────────────────────────────────────────────────
+- id: hot-reload
+  name: ./plugins/hot-reload.js
+  config:
+    paths:                    # 监听目录（改这些目录下的 .js 即时生效）
+      - ./content
+    debounce: 200             # 防抖毫秒数
