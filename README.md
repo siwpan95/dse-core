@@ -184,6 +184,9 @@ dse help
 | 结构 | `npm run lint:content` | 悬空 goto / 可达性 / 结局判定 / 模式契约 / 账本 / 数值字段 / 厚度 |
 | 状态遍历 | `npm run test:traverse` | 从 entry DFS 全图：真实执行每条 goto 边、每个效果、每个条件 |
 | **总门** | `npm run test:coverage` | 每个结局必须有 T（遍历）或 E（e2e）来源；双缺 → 退出码 1 |
+| 转录（留存） | `node tests/playthrough.mjs [--only=A,B]` | 逐线实跑，stdout 剧本落盘 `deliverables/playthrough/<id>.md`（人读，不作通过门） |
+| 转录调度 | `npm run play:auto` | 每小时自动跑一条"历史最少"的路线并归档（`--route=<id>` / `--dry-run`） |
+| 路线同步 | `npm run gen:routes` | 从 `tests/e2e.mjs` 抽取叙事路线 → `scripts/routes.generated.json` |
 
 当前：单元 31 / e2e 25（40 断言）/ CLI 17；示例内容 14 场景、5 结局全部覆盖，lint 0 错误 0 警告。
 

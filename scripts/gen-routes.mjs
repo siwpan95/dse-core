@@ -139,6 +139,23 @@ function extract(block) {
   return { steps, ending, endingId }
 }
 
+/**
+ * 新结构（dse-core 的 e2e）抽取：`await t('<标题>', async () => { ... play('<序列>') })`
+ * 老结构基于 launch()/g.send()/choose()，对 dse-core 的 e2e 一条也抽不到 ——
+ * 补这一路，让"内容扩充后重跑生成器即可同步"这条承诺在新仓库同样成立。
+ */
+function extractInputs(body) {
+  const out = []
+  // 形式 1：play('1,2,a')
+  for (const m of body.matchAll(/\bplay\(\s*'([^']*)'/g)) out.push(m[1])
+  // 形式 2：['1','2'].join(',')（长序列分行写）
+  for (const m of body.matchAll(/\[([\s\S]*?)\]\s*\.join\(','\)/g)) {
+    const items = [...m[1].matchAll(/'([^']*)'/g)].map((x) => x[1])
+    if (items.length) out.push(items.join(','))
+  }
+  return out
+}
+
 const src = readFileSync(E2E, 'utf8')
 const blocks = parseBlocks(src)
 const existing = handWrittenIds()
@@ -175,6 +192,36 @@ for (const b of blocks) {
     const title = segs.length > 1 ? `${b.title} → ${ending}` : b.title
     routes.push({ id, title, ending, endingId, steps })
   })
+}
+
+// 老结构一条都没抽到时，退回新结构抽取（dse-core 的 e2e）
+if (!routes.length) {
+  const re = /await\s+t\(\s*'([^']+)'\s*,\s*async\s*\(\)\s*=>\s*\{([\s\S]*?)\n\}\)/g
+  let n = 0
+  for (const m of src.matchAll(re)) {
+    const title = m[1]
+    const body = m[2]
+    const inputs = extractInputs(body)
+    if (!inputs.length) { skipped.push({ id: '—', title, reason: '未抽到 play() 输入序列' }); continue }
+    const frags = [...body.matchAll(/has\(\s*out\s*,\s*([^)]*)\)/g)]
+      .flatMap((x) => [...x[1].matchAll(/'([^']+)'/g)].map((y) => y[1]))
+    const ending = frags.find((f) => f.includes('结局')) ?? frags.at(-1) ?? ''
+    // 只保留"真叙事线"：基建类用例（启动渲染 / 未识别输入 / stats…）是断言而非
+    // 剧本，转成转录路线只会制造噪音
+    if (!ending.includes('结局') && !title.includes('线') && !title.includes('结局')) {
+      skipped.push({ id: '—', title, reason: '非叙事线（基建/命令类用例）' })
+      continue
+    }
+    const steps = inputs.join(',').split(',')
+    // 与 playthrough 手写路线重复（同输入序列）的不再生成
+    const written = [...readFileSync(PLAYTHROUGH, 'utf8').matchAll(/input:\s*'([^']*)'/g)].map((x) => x[1])
+    if (written.includes(steps.join(','))) {
+      skipped.push({ id: '—', title, reason: '与 playthrough 手写路线同序列' })
+      continue
+    }
+    n++
+    routes.push({ id: `R${n}`, title, ending, endingId: '', steps })
+  }
 }
 
 const payload = {
