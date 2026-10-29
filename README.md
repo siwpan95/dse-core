@@ -5,7 +5,7 @@
 > 本仓在 siwpan 投资组合（D:/projects/repos，共 133 仓）中定级为 **① 核心推进**，领域 **游戏引擎/框架**，定位 **引擎平台层（枢纽）**。
 > **角色**：持续投入：场景引擎内核（Node），TRPG/叙事枢纽。
 > **维护策略**：① 核心推进——持续投入、不允许冻结；随所属收敛点 / 流水线长期演进。
-> 投资组合统一分级索引：`D:/projects/repos/PORTFOLIO_TIERING.md`。
+> 投资组合统一分级索引（多机可查）：[组合分级决策索引 · allin 事实源](https://gitee.com/siwpan/allin/blob/master/docs/事实源/组合分级决策索引.md)。
 
 > Dictionary Scene Engine · Core —— 基于 **Cordis 4.0** 插件架构的文字冒险 / 互动叙事引擎内核。
 > 核心理念一句话：**场景即字典，能力即插件** —— 内容由场景字典描述，引擎的每个能力是一个可插拔插件，两者通过 `cordis.yml` 声明式组装。
